@@ -7,7 +7,7 @@ top_k = 1000
 
 
 def append_feature(raw, data, flaten=False):
-    data = np.array(data)
+    data = np.array(data.cpu())
     if flaten:
         data = data.reshape(-1, 1)
     if raw is None:

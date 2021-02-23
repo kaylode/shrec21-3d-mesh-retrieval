@@ -2,16 +2,18 @@ import numpy as np
 import os
 import torch
 import torch.utils.data as data
+import torch.nn.functional as F
+
 
 type_to_index_map = {
-    'night_stand': 0, 'range_hood': 1, 'plant': 2, 'chair': 3, 'tent': 4,
-    'curtain': 5, 'piano': 6, 'dresser': 7, 'desk': 8, 'bed': 9,
-    'sink': 10,  'laptop':11, 'flower_pot': 12, 'car': 13, 'stool': 14,
-    'vase': 15, 'monitor': 16, 'airplane': 17, 'stairs': 18, 'glass_box': 19,
-    'bottle': 20, 'guitar': 21, 'cone': 22,  'toilet': 23, 'bathtub': 24,
-    'wardrobe': 25, 'radio': 26,  'person': 27, 'xbox': 28, 'bowl': 29,
-    'cup': 30, 'door': 31,  'tv_stand': 32,  'mantel': 33, 'sofa': 34,
-    'keyboard': 35, 'bookshelf': 36,  'bench': 37, 'table': 38, 'lamp': 39
+    'botella':0, 
+    'cantaro':1,
+    'cuenco':2,
+    'figurina':3,
+    'lebrillo':4,
+    'olla':5,
+    'plato':6,
+    'vaso':7,
 }
 
 
@@ -34,8 +36,8 @@ class ModelNet40(data.Dataset):
     def __getitem__(self, i):
         path, type = self.data[i]
         data = np.load(path)
-        face = data['face']
-        neighbor_index = data['neighbor_index']
+        face = data['faces']
+        neighbor_index = data['neighbors']
 
         # data augmentation
         if self.augment_data and self.part == 'train':
@@ -69,3 +71,14 @@ class ModelNet40(data.Dataset):
 
     def __len__(self):
         return len(self.data)
+
+    
+
+    def collate_fn(self, batch):
+        centers = torch.stack([i[0] if i[0].shape[-1] == 5000 else F.pad(i[0], pad=(0, 1), mode='constant', value=0) for i in batch])
+        corners = torch.stack([i[1] if i[1].shape[-1] == 5000 else F.pad(i[1], pad=(0, 1), mode='constant', value=0) for i in batch])
+        normals = torch.stack([i[2] if i[2].shape[-1] == 5000 else F.pad(i[2], pad=(0, 1), mode='constant', value=0) for i in batch])
+        neighbor_index = torch.stack([i[3] if i[3].shape[0] == 5000 else torch.cat([i[3], torch.zeros(1,3)]) for i in batch]).type(torch.LongTensor)
+        target = torch.stack([i[4] for i in batch])
+
+        return centers, corners, normals, neighbor_index, target
