@@ -35,7 +35,7 @@ class BaseDataset(data.Dataset):
                     features = data['edge_features']
                     mean = mean + features.mean(axis=1)
                     std = std + features.std(axis=1)
-                    i += 1
+                    i+=1
                     pbar.update(1)
             mean = mean / (i + 1)
             std = std / (i + 1)
