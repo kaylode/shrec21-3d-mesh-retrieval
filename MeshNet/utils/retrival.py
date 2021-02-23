@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # all 2468 shapes
-top_k = 1000
+top_k = 5
 
 
 def append_feature(raw, data, flaten=False):

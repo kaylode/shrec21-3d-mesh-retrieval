@@ -102,8 +102,8 @@ if __name__ == '__main__':
     model = nn.DataParallel(model)
 
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(model.parameters(), lr=cfg['lr'], momentum=cfg['momentum'], weight_decay=cfg['weight_decay'])
-    scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=cfg['milestones'], gamma=cfg['gamma'])
+    optimizer = optim.Adam(model.parameters(), lr=cfg['lr'], weight_decay=cfg['weight_decay'])
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=cfg['step_size'], gamma=cfg['gamma'])
 
     best_model_wts = train_model(model, criterion, optimizer, scheduler, cfg)
     torch.save(best_model_wts, os.path.join(cfg['ckpt'], 'MeshNet_best.pkl'))

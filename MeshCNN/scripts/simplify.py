@@ -8,7 +8,7 @@ from easydict import EasyDict
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--folder_in', type=str, help='frequency of showing training results on console')
-parser.add_argument('--target_n_faces', type=str, default=5000, help='frequency of saving the latest results')
+parser.add_argument('--target_n_faces', type=int, default=5000, help='frequency of saving the latest results')
 parser.add_argument('--folder_out', type=str, default='./simplified', help='frequency of saving the latest results')
 
 args = parser.parse_args()
