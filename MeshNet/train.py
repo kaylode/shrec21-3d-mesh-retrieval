@@ -103,7 +103,8 @@ if __name__ == '__main__':
 
     if 'pretrained' in cfg.keys():
         model.load_state_dict(torch.load(cfg['pretrained']))
-
+    model.module.classifier[-1] = nn.Linear(in_features=256, out_features=8)
+    
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=cfg['lr'], momentum=cfg['momentum'], weight_decay=cfg['weight_decay'])
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=cfg['step_size'], gamma=cfg['gamma'])
