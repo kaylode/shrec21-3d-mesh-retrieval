@@ -75,10 +75,10 @@ class ModelNet40(data.Dataset):
     
 
     def collate_fn(self, batch):
-        centers = torch.stack([i[0] if i[0].shape[-1] == 7000 else F.pad(i[0], pad=(0, 1), mode='constant', value=0) for i in batch])
-        corners = torch.stack([i[1] if i[1].shape[-1] == 7000 else F.pad(i[1], pad=(0, 1), mode='constant', value=0) for i in batch])
-        normals = torch.stack([i[2] if i[2].shape[-1] == 7000 else F.pad(i[2], pad=(0, 1), mode='constant', value=0) for i in batch])
-        neighbor_index = torch.stack([i[3] if i[3].shape[0] == 7000 else torch.cat([i[3], torch.zeros(1,3)]) for i in batch]).type(torch.LongTensor)
+        centers = torch.stack([i[0] if i[0].shape[-1] == 10000 else F.pad(i[0], pad=(0, 1), mode='constant', value=0) for i in batch])
+        corners = torch.stack([i[1] if i[1].shape[-1] == 10000 else F.pad(i[1], pad=(0, 1), mode='constant', value=0) for i in batch])
+        normals = torch.stack([i[2] if i[2].shape[-1] == 10000 else F.pad(i[2], pad=(0, 1), mode='constant', value=0) for i in batch])
+        neighbor_index = torch.stack([i[3] if i[3].shape[0] == 10000 else torch.cat([i[3], torch.zeros(1,3)]) for i in batch]).type(torch.LongTensor)
         target = torch.stack([i[4] for i in batch])
 
         return centers, corners, normals, neighbor_index, target

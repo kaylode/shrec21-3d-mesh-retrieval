@@ -101,9 +101,15 @@ if __name__ == '__main__':
     model.cuda()
     model = nn.DataParallel(model)
 
+    if 'pretrained' in cfg.keys():
+        model.load_state_dict(torch.load(cfg['pretrained']))
+
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=cfg['lr'], weight_decay=cfg['weight_decay'])
+    optimizer = optim.SGD(model.parameters(), lr=cfg['lr'], momentum=cfg['momentum'], weight_decay=cfg['weight_decay'])
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=cfg['step_size'], gamma=cfg['gamma'])
 
-    best_model_wts = train_model(model, criterion, optimizer, scheduler, cfg)
-    torch.save(best_model_wts, os.path.join(cfg['ckpt'], 'MeshNet_best.pkl'))
+    try:
+        best_model_wts = train_model(model, criterion, optimizer, scheduler, cfg)
+        torch.save(best_model_wts, os.path.join(cfg['ckpt_root'], 'MeshNet_best.pkl'))
+    except KeyboardInterrupt:
+        torch.save(copy.deepcopy(model.state_dict()), 'ckpt_root/{}.pkl'.format('last'))

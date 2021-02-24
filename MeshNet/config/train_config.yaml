@@ -5,12 +5,13 @@ cuda_devices: '0'   # multi-gpu training is available
 dataset:
   data_root: '/content/main/MeshNet/datasets/shrec_21/fold_1_simplified/'
   augment_data: true
-  max_faces: 7000
+  max_faces: 10000
 
 # result
 ckpt_root: 'ckpt_root/'
 
 # MeshNet
+pretrained: ./weight/MeshNet_best_9192.pkl
 MeshNet:
   structural_descriptor:
     num_kernel: 64

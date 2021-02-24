@@ -74,7 +74,7 @@ if __name__ == '__main__':
             for file in files:
                 # load mesh
                 mesh_ = load_mesh(file)
-                mesh = remesh(mesh_, target_n_faces=7000)
+                mesh = remesh(mesh_, target_n_faces=10000)
 
 
                 # get elements
