@@ -42,6 +42,8 @@ def test_model(model):
     print('Accuracy: {:.4f}'.format(float(correct_num) / len(data_set)))
     print('mAP: {:.4f}'.format(calculate_map(ft_all, lbl_all)))
 
+    
+
 
 if __name__ == '__main__':
 

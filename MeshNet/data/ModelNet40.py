@@ -19,11 +19,12 @@ type_to_index_map = {
 
 class ModelNet40(data.Dataset):
 
-    def __init__(self, cfg, part='train'):
+    def __init__(self, cfg, part='train', return_index=False):
         self.root = cfg['data_root']
         self.augment_data = cfg['augment_data']
         self.max_faces = cfg['max_faces']
         self.part = part
+        self.return_index = return_index
 
         self.data = []
         for type in os.listdir(self.root):
@@ -67,7 +68,11 @@ class ModelNet40(data.Dataset):
         centers, corners, normals = face[:3], face[3:12], face[12:]
         corners = corners - torch.cat([centers, centers, centers], 0)
 
-        return centers, corners, normals, neighbor_index, target
+        if self.return_index:
+            filename = os.path.basename(path)
+            return centers, corners, normals, neighbor_index, target, filename 
+        else:
+            return centers, corners, normals, neighbor_index, target
 
     def __len__(self):
         return len(self.data)
@@ -81,4 +86,9 @@ class ModelNet40(data.Dataset):
         neighbor_index = torch.stack([i[3] if i[3].shape[0] == 15000 else torch.cat([i[3], torch.zeros(1,3)]) for i in batch]).type(torch.LongTensor)
         target = torch.stack([i[4] for i in batch])
 
-        return centers, corners, normals, neighbor_index, target
+        if self.return_index:
+            filename = [i[5] for i in batch]
+            return centers, corners, normals, neighbor_index, target, filename
+        else:
+            return centers, corners, normals, neighbor_index, target
+
