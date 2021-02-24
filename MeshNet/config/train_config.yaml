@@ -11,7 +11,7 @@ dataset:
 ckpt_root: 'ckpt_root/'
 
 # MeshNet
-pretrained: ./weight/MeshNet_best_9192.pkl
+pretrained: '/content/drive/MyDrive/weights/SHREC21/retrieval/MeshNet/15k/'
 MeshNet:
   structural_descriptor:
     num_kernel: 64
