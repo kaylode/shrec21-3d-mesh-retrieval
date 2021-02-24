@@ -9,7 +9,7 @@ from config import get_train_config
 from data import ModelNet40
 from models import MeshNet
 from utils import append_feature, calculate_map
-
+from tqdm.notebook import tqdm
 
 cfg = get_train_config()
 os.environ['CUDA_VISIBLE_DEVICES'] = cfg['cuda_devices']
@@ -48,7 +48,7 @@ def train_model(model, criterion, optimizer, scheduler, cfg):
                 running_corrects = 0
                 ft_all, lbl_all = None, None
 
-                for i, (centers, corners, normals, neighbor_index, targets) in enumerate(data_loader[phrase]):
+                for i, (centers, corners, normals, neighbor_index, targets) in enumerate(tqdm(data_loader[phrase])):
 
                     optimizer.zero_grad()
 
