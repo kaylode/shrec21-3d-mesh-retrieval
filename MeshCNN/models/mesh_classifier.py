@@ -35,7 +35,7 @@ class ClassifierModel:
         self.criterion = networks.define_loss(opt).to(self.device)
 
         if self.is_train:
-            self.optimizer = torch.optim.Adam(self.net.parameters(), lr=opt.lr, betas=(opt.beta1, 0.999))
+            self.optimizer = torch.optim.SGD(self.net.parameters(), lr=opt.lr, momentum=0.9)
             self.scheduler = networks.get_scheduler(self.optimizer, opt)
             print_network(self.net)
 
@@ -55,6 +55,8 @@ class ClassifierModel:
 
     def forward(self):
         out = self.net(self.edge_features, self.mesh)
+        self.edge_features = None
+        self.mesh = None
         return out
 
     def backward(self, out):
