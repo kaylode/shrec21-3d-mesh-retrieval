@@ -19,7 +19,7 @@ data_set = {
     x: ModelNet40(cfg=cfg['dataset'], part=x) for x in ['train', 'test']
 }
 data_loader = {
-    x: data.DataLoader(data_set[x], batch_size=cfg['batch_size'], num_workers=4, shuffle=True, pin_memory=False, collate_fn=data_set[x].collate_fn)
+    x: data.DataLoader(data_set[x], batch_size=cfg['batch_size'], num_workers=8, shuffle=True, pin_memory=True, collate_fn=data_set[x].collate_fn)
     for x in ['train', 'test']
 }
 
@@ -92,9 +92,9 @@ def train_model(model, criterion, optimizer, scheduler, cfg):
 
                     print('{} Loss: {:.4f} Acc: {:.4f} mAP: {:.4f}'.format(phrase, epoch_loss, epoch_acc, epoch_map))
     except KeyboardInterrupt:
-        return best_model_wts
+        return best_model_wts, best_acc
 
-    return best_model_wts
+    return best_model_wts, best_acc
 
 
 if __name__ == '__main__':
@@ -112,7 +112,8 @@ if __name__ == '__main__':
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=cfg['step_size'], gamma=cfg['gamma'])
 
     
-    best_model_wts = train_model(model, criterion, optimizer, scheduler, cfg)
-    torch.save(best_model_wts, os.path.join(cfg['ckpt_root'], 'MeshNet_best.pkl'))
+    best_model_wts, best_acc = train_model(model, criterion, optimizer, scheduler, cfg)
+    torch.save(best_model_wts, os.path.join(cfg['ckpt_root'], f'MeshNet_best_{best_acc}.pkl'))
+    print(f'Best model saved! Best Acc: {best_acc}')
     
         
