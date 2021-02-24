@@ -20,7 +20,7 @@ MeshNet:
     aggregation_method: 'Concat'  # Concat/Max/Average
 
 # train
-lr: 0.01
+lr: 0.001
 momentum: 0.9
 weight_decay: 0.0005
 batch_size: 4
