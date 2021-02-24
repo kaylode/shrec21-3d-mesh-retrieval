@@ -39,6 +39,7 @@ def train_model(model, criterion, optimizer, scheduler, cfg):
             for phrase in ['train', 'test']:
 
                 if phrase == 'train':
+                    scheduler.step()
                     model.train()
                 else:
                     model.eval()
@@ -65,7 +66,6 @@ def train_model(model, criterion, optimizer, scheduler, cfg):
                         if phrase == 'train':
                             loss.backward()
                             optimizer.step()
-                            scheduler.step()
 
                         if phrase == 'test':
                             ft_all = append_feature(ft_all, feas.detach())
@@ -88,7 +88,7 @@ def train_model(model, criterion, optimizer, scheduler, cfg):
                     if epoch_map > best_map:
                         best_map = epoch_map
                     if epoch % 10 == 0:
-                        torch.save(copy.deepcopy(model.state_dict()), 'ckpt_root/{}.pkl'.format(epoch))
+                        torch.save(copy.deepcopy(model.state_dict()), os.path.join(cfg['ckpt_root'],f'{epoch}.pkl'))
 
                     print('{} Loss: {:.4f} Acc: {:.4f} mAP: {:.4f}'.format(phrase, epoch_loss, epoch_acc, epoch_map))
     except KeyboardInterrupt:
