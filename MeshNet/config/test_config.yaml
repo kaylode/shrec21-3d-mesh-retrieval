@@ -3,9 +3,9 @@ cuda_devices: '0'
 
 # dataset
 dataset:
-  data_root: 'ModelNet40_MeshNet/'
+  data_root: '/content/main/MeshNet/datasets/shrec_21/fold_1_simplified/'
   augment_data: false
-  max_faces: 1024
+  max_faces: 15000
 
 # model
 load_model: 'MeshNet_best_9192.pkl'
