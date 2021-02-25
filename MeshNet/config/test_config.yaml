@@ -3,12 +3,12 @@ cuda_devices: '0'
 
 # dataset
 dataset:
-  data_root: '/content/main/MeshNet/datasets/shrec_21/fold_1_simplified/'
+  data_root: '/home/nhtlong/pmkhoi/shrec21/retrieval/MeshNet/datasets/datasetCulture/simplified_folds/fold_3'
   augment_data: false
-  max_faces: 15000
+  max_faces: 30000
 
 # model
-load_model: 'MeshNet_best_9192.pkl'
+load_model: ''
 
 # MeshNet
 MeshNet:

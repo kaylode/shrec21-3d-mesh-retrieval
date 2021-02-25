@@ -4,6 +4,20 @@ import os
 import trimesh
 from tqdm import tqdm
 import open3d
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-t', '--task',
+                    type=str,
+                    help='task [Culture|Shape]')
+parser.add_argument('-f', '--fold',
+                    type=int,
+                    help='fold index')
+parser.add_argument('--num_faces',
+                    type=int,
+                    help='number of faces to simplify to')
+args = parser.parse_args()
+
 
 def as_mesh(scene_or_mesh):
     if isinstance(scene_or_mesh, trimesh.Scene):
@@ -53,8 +67,8 @@ def find_neighbor(faces, faces_contain_this_vertex, vf1, vf2, except_face):
 
 if __name__ == '__main__':
 
-    root = '/content/main/MeshNet/datasets/shrec_21/fold_1'
-    new_root = '/content/main/MeshNet/datasets/shrec_21/fold_1_simplified/'
+    root = f'/home/nhtlong/pmkhoi/shrec21/retrieval/MeshNet/datasets/dataset{args.task}/folds/fold_{args.fold}'
+    new_root = f'/home/nhtlong/pmkhoi/shrec21/retrieval/MeshNet/datasets/dataset{args.task}/simplified_folds/fold_{args.fold}'
     if not os.path.exists(new_root):
         os.mkdir(new_root)
     for type in os.listdir(root):
@@ -74,7 +88,7 @@ if __name__ == '__main__':
             for file in files:
                 # load mesh
                 mesh_ = load_mesh(file)
-                mesh = remesh(mesh_, target_n_faces=15000)
+                mesh = remesh(mesh_, target_n_faces=args.num_faces)
 
 
                 # get elements

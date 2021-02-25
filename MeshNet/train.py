@@ -9,7 +9,8 @@ from config import get_train_config
 from data import ModelNet40
 from models import MeshNet
 from utils import append_feature, calculate_map
-from tqdm.notebook import tqdm
+from tqdm import tqdm
+from losses import FocalLoss
 
 cfg = get_train_config()
 os.environ['CUDA_VISIBLE_DEVICES'] = cfg['cuda_devices']
@@ -59,7 +60,7 @@ def train_model(model, criterion, optimizer, scheduler, cfg):
                     targets = Variable(torch.cuda.LongTensor(targets.cuda()))
 
                     with torch.set_grad_enabled(phrase == 'train'):
-                        outputs, feas = model(centers, corners, normals, neighbor_index)
+                        outputs, _ = model(centers, corners, normals, neighbor_index)
                         _, preds = torch.max(outputs, 1)
                         loss = criterion(outputs, targets)
 
@@ -67,9 +68,6 @@ def train_model(model, criterion, optimizer, scheduler, cfg):
                             loss.backward()
                             optimizer.step()
 
-                        if phrase == 'test':
-                            ft_all = append_feature(ft_all, feas.detach())
-                            lbl_all = append_feature(lbl_all, targets.detach(), flaten=True)
 
                         running_loss += loss.item() * centers.size(0)
                         running_corrects += torch.sum(preds == targets.data)
@@ -81,16 +79,13 @@ def train_model(model, criterion, optimizer, scheduler, cfg):
                     print('{} Loss: {:.4f} Acc: {:.4f}'.format(phrase, epoch_loss, epoch_acc))
 
                 if phrase == 'test':
-                    epoch_map = calculate_map(ft_all, lbl_all)
                     if epoch_acc > best_acc:
                         best_acc = epoch_acc
                         best_model_wts = copy.deepcopy(model.state_dict())
-                    if epoch_map > best_map:
-                        best_map = epoch_map
                     if epoch % 10 == 0:
                         torch.save(copy.deepcopy(model.state_dict()), os.path.join(cfg['ckpt_root'],f'{epoch}.pkl'))
 
-                    print('{} Loss: {:.4f} Acc: {:.4f} mAP: {:.4f}'.format(phrase, epoch_loss, epoch_acc, epoch_map))
+                    print('{} Loss: {:.4f} Acc: {:.4f}'.format(phrase, epoch_loss, epoch_acc))
     except KeyboardInterrupt:
         return best_model_wts, best_acc
 
@@ -107,7 +102,7 @@ if __name__ == '__main__':
         model.load_state_dict(torch.load(cfg['pretrained']))
     model.module.classifier[-1] = nn.Linear(in_features=256, out_features=8).cuda()
 
-    criterion = nn.CrossEntropyLoss()
+    criterion = FocalLoss()
     optimizer = optim.AdamW(model.parameters(), lr=cfg['lr'], weight_decay=cfg['weight_decay'])
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=cfg['step_size'], gamma=cfg['gamma'])
 

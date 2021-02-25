@@ -35,6 +35,7 @@ def parse_args():
                         help='output file name and directory')
     parser.add_argument('-m', '--mode',
                         type=str,
+                        default = 'euclidean',
                         help='distance [euclidean|cosine|dotprod]')
     parser.add_argument('-fmt', '--format',
                         type=str,
@@ -45,8 +46,8 @@ def parse_args():
 
 args = parse_args()
 
-q = np.load(args.query)
-g = np.load(args.gallery)
+q = np.load(args.query, allow_pickle=True)
+g = np.load(args.gallery, allow_pickle=True)
 dist = dist_func(args.mode)
 
 dist_mat = dist(q, g)

@@ -46,8 +46,8 @@ class MeshNet(nn.Module):
         fea = fea.reshape(fea.size(0), -1)
         fea = self.classifier[:-1](fea)
         cls = self.classifier[-1:](fea)
-
+        fea = torch.softmax(cls, dim=1)
         if self.require_fea:
-            return cls, fea / torch.norm(fea)
+            return cls, fea 
         else:
             return cls

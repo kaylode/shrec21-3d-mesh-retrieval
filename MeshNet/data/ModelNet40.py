@@ -5,17 +5,25 @@ import torch.utils.data as data
 import torch.nn.functional as F
 
 
-type_to_index_map = {
-    'botella':0, 
-    'cantaro':1,
-    'cuenco':2,
-    'figurina':3,
-    'lebrillo':4,
-    'olla':5,
-    'plato':6,
-    'vaso':7,
-}
+# type_to_index_map = {
+#     'botella':0, 
+#     'cantaro':1,
+#     'cuenco':2,
+#     'figurina':3,
+#     'lebrillo':4,
+#     'olla':5,
+#     'plato':6,
+#     'vaso':7,
+# }
 
+type_to_index_map = {
+    'CHANCAY':0, 
+    'LURIN':1,
+    'MARANGA':2,
+    'NAZCA':3,
+    'PANDO':4,
+    'SUPE':5
+}
 
 class ModelNet40(data.Dataset):
 
@@ -80,10 +88,10 @@ class ModelNet40(data.Dataset):
     
 
     def collate_fn(self, batch):
-        centers = torch.stack([i[0] if i[0].shape[-1] == 15000   else F.pad(i[0], pad=(0, 1), mode='constant', value=0) for i in batch])
-        corners = torch.stack([i[1] if i[1].shape[-1] == 15000 else F.pad(i[1], pad=(0, 1), mode='constant', value=0) for i in batch])
-        normals = torch.stack([i[2] if i[2].shape[-1] == 15000 else F.pad(i[2], pad=(0, 1), mode='constant', value=0) for i in batch])
-        neighbor_index = torch.stack([i[3] if i[3].shape[0] == 15000 else torch.cat([i[3], torch.zeros(1,3)]) for i in batch]).type(torch.LongTensor)
+        centers = torch.stack([i[0] if i[0].shape[-1] == self.max_faces   else F.pad(i[0], pad=(0, 1), mode='constant', value=0) for i in batch])
+        corners = torch.stack([i[1] if i[1].shape[-1] == self.max_faces else F.pad(i[1], pad=(0, 1), mode='constant', value=0) for i in batch])
+        normals = torch.stack([i[2] if i[2].shape[-1] == self.max_faces else F.pad(i[2], pad=(0, 1), mode='constant', value=0) for i in batch])
+        neighbor_index = torch.stack([i[3] if i[3].shape[0] == self.max_faces else torch.cat([i[3], torch.zeros(1,3)]) for i in batch]).type(torch.LongTensor)
         target = torch.stack([i[4] for i in batch])
 
         if self.return_index:

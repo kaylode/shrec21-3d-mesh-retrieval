@@ -9,11 +9,20 @@ from data import ModelNet40
 from models import MeshNet
 from utils import append_feature
 from tqdm import tqdm
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-w', '--weight',
+                    type=str,
+                    help='path to the trained weight')
+parser.add_argument('-f', '--fold',
+                    type=int,
+                    help='fold index')
+args = parser.parse_args()
 
 cfg = get_test_config()
 os.environ['CUDA_VISIBLE_DEVICES'] = cfg['cuda_devices']
 
-FOLD = 4
 
 data_set = {
     x: ModelNet40(cfg=cfg['dataset'], part=x, return_index=True) for x in ['train', 'test']
@@ -26,41 +35,39 @@ data_loader = {
 embed_dict = {}
 embed_npy = []
 def test_model(model):
+    with torch.no_grad():
+        correct_num = 0
+        ft_all, lbl_all = None, None
+        for x in ['train', 'test']:
+            for i, (centers, corners, normals, neighbor_index, targets, filename) in enumerate(tqdm(data_loader[x])):
+                file_id = int(filename[0][:-4])
+                centers = Variable(torch.cuda.FloatTensor(centers.cuda()))
+                corners = Variable(torch.cuda.FloatTensor(corners.cuda()))
+                normals = Variable(torch.cuda.FloatTensor(normals.cuda()))
+                neighbor_index = Variable(torch.cuda.LongTensor(neighbor_index.cuda()))
+                targets = Variable(torch.cuda.LongTensor(targets.cuda()))
 
-    correct_num = 0
-    ft_all, lbl_all = None, None
-    for x in ['train', 'test']:
-        for i, (centers, corners, normals, neighbor_index, targets, filename) in enumerate(tqdm(data_loader[x])):
-            file_id = int(filename[0][:-4])
-            centers = Variable(torch.cuda.FloatTensor(centers.cuda()))
-            corners = Variable(torch.cuda.FloatTensor(corners.cuda()))
-            normals = Variable(torch.cuda.FloatTensor(normals.cuda()))
-            neighbor_index = Variable(torch.cuda.LongTensor(neighbor_index.cuda()))
-            targets = Variable(torch.cuda.LongTensor(targets.cuda()))
+                _, feas = model(centers, corners, normals, neighbor_index)
+                ft_all = feas.cpu().squeeze(0).numpy()
+                embed_dict[file_id] = ft_all
 
-            _, feas = model(centers, corners, normals, neighbor_index)
-            ft_all = append_feature(ft_all, feas.detach())
-
-            embed_dict[file_id] = ft_all
-
-    ids = sorted(list(embed_dict.keys()))
-    for i in ids:
-        embed_npy.append(embed_dict[i])
+        ids = sorted(list(embed_dict.keys()))
+        for i in ids:
+            embed_npy.append(embed_dict[i])
 
     print(f'Number of embeddings: {len(ids)}')
-    np.save(f'./results/embed_fold_{FOLD}.npy',embed_npy)
+    np.save(f'./results/{args.fold}/embed_fold_{args.fold}.npy',embed_npy)
 
 if __name__ == '__main__':
 
     model = MeshNet(cfg=cfg['MeshNet'], require_fea=True)
     model.cuda()
     model = nn.DataParallel(model)
-    model.module.classifier[-1] = nn.Linear(in_features=256, out_features=8).cuda()
-    if 'load_model' in cfg.keys():
-        model.load_state_dict(torch.load(cfg['load_model']))
+    model.module.classifier[-1] = nn.Linear(in_features=256, out_features=6).cuda()
+    model.load_state_dict(torch.load(args.weight))
     
-    if not os.path.exists('./results'):
-        os.mkdir('results')
+    if not os.path.exists(f'./results/{args.fold}'):
+        os.makedirs(f'./results/{args.fold}')
     model.eval()
 
     test_model(model)
