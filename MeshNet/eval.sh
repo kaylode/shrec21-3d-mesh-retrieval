@@ -6,7 +6,7 @@ TASK='Shape'
 WEIGHT=''
 
 NPY_PATH="$ROOT/results/${FOLD}/embed_fold_${FOLD}.npy"
-GT_NPY_PATH='/home/nhtlong/pmkhoi/shrec21/retrieval/MeshNet/results/gt.npy'
+GT_NPY_PATH="$ROOT/results/gt.npy"
 TXT_PATH="$ROOT/results/${FOLD}/f${FOLD}-distmat.txt"
 QUERY_CSV="$ROOT/datasets/dataset${TASK}/annotations/${FOLD}_val.csv"
 GALLERY_CSV="$ROOT/datasets/dataset${TASK}/annotations/${FOLD}_train.csv"

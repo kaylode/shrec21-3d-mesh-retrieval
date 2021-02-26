@@ -1,4 +1,5 @@
-ROOT=''
+ROOT='/home/nhtlong/pmkhoi/shrec21/retrieval/MeshNet/'
+
 FOLD=2
 TASK='Shape'
 NUM_FACES=20000
