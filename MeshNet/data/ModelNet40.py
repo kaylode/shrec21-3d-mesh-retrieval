@@ -5,25 +5,25 @@ import torch.utils.data as data
 import torch.nn.functional as F
 
 
-type_to_index_map = {
-    'botella':0, 
-    'cantaro':1,
-    'cuenco':2,
-    'figurina':3,
-    'lebrillo':4,
-    'olla':5,
-    'plato':6,
-    'vaso':7,
-}
-
 # type_to_index_map = {
-#     'CHANCAY':0, 
-#     'LURIN':1,
-#     'MARANGA':2,
-#     'NAZCA':3,
-#     'PANDO':4,
-#     'SUPE':5
+#     'botella':0, 
+#     'cantaro':1,
+#     'cuenco':2,
+#     'figurina':3,
+#     'lebrillo':4,
+#     'olla':5,
+#     'plato':6,
+#     'vaso':7,
 # }
+
+type_to_index_map = {
+    'CHANCAY':0, 
+    'LURIN':1,
+    'MARANGA':2,
+    'NAZCA':3,
+    'PANDO':4,
+    'SUPE':5
+}
 
 class ModelNet40(data.Dataset):
 

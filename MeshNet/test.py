@@ -16,6 +16,12 @@ parser.add_argument('-w', '--weight',
 parser.add_argument('-t', '--task',
                     type=str,
                     help='[Culture|Shape]')
+parser.add_argument('--num_faces',
+                    type=int,
+                    help='number of faces')
+parser.add_argument('-r', '--test_root',
+                    type=str,
+                    help='number of faces')
 args = parser.parse_args()
 
 

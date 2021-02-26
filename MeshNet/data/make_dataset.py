@@ -35,8 +35,8 @@ def make_folder(df, type_='train'):
     class_count = [0 for i in range(len(class_indexes))]        
     for idx, row in tqdm(df.iterrows()):
         obj_id, class_id = row
-        class_path = os.path.join(ROOT_DIR, str(class_name[class_id]), type_, f'{obj_id}.obj')
-        copyfile(f"{args.root}/datasets/dataset{args.task}/objects/train/{obj_id}.obj", class_path)
+        class_path = os.path.join(ROOT_DIR, str(class_name[class_id]), type_, f'{obj_id}.npz')
+        copyfile(f"{args.root}/datasets/dataset{args.task}/objects/train_simplified/{obj_id}.npz", class_path)
         class_count[class_id] += 1
     print(class_count)
 

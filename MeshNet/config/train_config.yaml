@@ -14,7 +14,7 @@ ckpt_root: ""
 pretrained: '/home/nhtlong/pmkhoi/shrec21/retrieval/MeshNet/weight/MeshNet_best_9192.pkl'
 MeshNet:
   structural_descriptor:
-    num_kernel: 64
+    num_kernel: 256 #64
     sigma: 0.2
   mesh_convolution:
     aggregation_method: 'Concat'  # Concat/Max/Average
@@ -23,7 +23,7 @@ MeshNet:
 lr: 0.001
 momentum: 0.9
 weight_decay: 0.0005
-batch_size: 8
+batch_size: 4
 max_epoch: 120
 step_size: 75
 gamma: 0.5
