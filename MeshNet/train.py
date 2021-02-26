@@ -49,6 +49,7 @@ def train_model(model, criterion, optimizer, scheduler, cfg):
 
     best_acc = 0.0
     best_map = 0.0
+    best_loss = 100
     best_model_wts = copy.deepcopy(model.state_dict())
     try:
         for epoch in range(1, cfg['max_epoch']):
@@ -102,14 +103,17 @@ def train_model(model, criterion, optimizer, scheduler, cfg):
                     if epoch_acc > best_acc:
                         best_acc = epoch_acc
                         best_model_wts = copy.deepcopy(model.state_dict())
+                    if epoch_loss < best_loss:
+                        best_loss = epoch_loss
+                        best_model_loss_wts = copy.deepcopy(model.state_dict())
                     if epoch % 10 == 0:
                         torch.save(copy.deepcopy(model.state_dict()), os.path.join(cfg['saved_path'],f'{epoch}.pkl'))
 
                     print('{} Loss: {:.4f} Acc: {:.4f}'.format(phrase, epoch_loss, epoch_acc))
     except KeyboardInterrupt:
-        return best_model_wts, best_acc
+        return best_model_wts, best_model_loss_wts, best_acc, best_loss
 
-    return best_model_wts, best_acc
+    return best_model_wts, best_model_loss_wts, best_acc, best_loss
 
 
 if __name__ == '__main__':
@@ -133,8 +137,9 @@ if __name__ == '__main__':
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=cfg['step_size'], gamma=cfg['gamma'])
 
     
-    best_model_wts, best_acc = train_model(model, criterion, optimizer, scheduler, cfg)
+    best_model_wts, best_model_loss_wts, best_acc, best_loss = train_model(model, criterion, optimizer, scheduler, cfg)
     torch.save(best_model_wts, os.path.join(cfg['saved_path'], f'MeshNet_best_{best_acc}.pkl'))
+    torch.save(best_model_loss_wts, os.path.join(cfg['saved_path'], f'MeshNet_{best_loss}.pkl'))
     print(f'Best model saved! Best Acc: {best_acc}')
     
         
