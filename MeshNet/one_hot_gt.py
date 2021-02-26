@@ -6,7 +6,7 @@ import pandas as pd
 
 
 
-CSV_FILE = '/home/nhtlong/pmkhoi/shrec21/retrieval/MeshNet/datasets/datasetCulture/annotations/dataset.csv'
+CSV_FILE = '/home/nhtlong/pmkhoi/shrec21/retrieval/MeshNet/datasets/datasetShape/annotations/dataset.csv'
 
 def one_hot_embedding(label):
     return np.eye(8)[label]

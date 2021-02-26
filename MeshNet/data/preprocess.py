@@ -7,6 +7,9 @@ import open3d
 import argparse
 
 parser = argparse.ArgumentParser()
+parser.add_argument('-r', '--root',
+                    type=str,
+                    help='path to MeshNet')
 parser.add_argument('-t', '--task',
                     type=str,
                     help='task [Culture|Shape]')
@@ -67,8 +70,8 @@ def find_neighbor(faces, faces_contain_this_vertex, vf1, vf2, except_face):
 
 if __name__ == '__main__':
 
-    root = f'/home/nhtlong/pmkhoi/shrec21/retrieval/MeshNet/datasets/dataset{args.task}/folds/fold_{args.fold}'
-    new_root = f'/home/nhtlong/pmkhoi/shrec21/retrieval/MeshNet/datasets/dataset{args.task}/simplified_folds/fold_{args.fold}'
+    root = f'{args.root}/datasets/dataset{args.task}/folds/fold_{args.fold}'
+    new_root = f'{args.root}/datasets/dataset{args.task}/simplified_folds/fold_{args.fold}'
     if not os.path.exists(new_root):
         os.mkdir(new_root)
     for type in os.listdir(root):

@@ -95,12 +95,12 @@ def train_model(model, criterion, optimizer, scheduler, cfg):
 if __name__ == '__main__':
 
     model = MeshNet(cfg=cfg['MeshNet'], require_fea=True)
-    model.cuda()
     model = nn.DataParallel(model)
 
     if 'pretrained' in cfg.keys():
         model.load_state_dict(torch.load(cfg['pretrained']))
-    model.module.classifier[-1] = nn.Linear(in_features=256, out_features=8).cuda()
+    model.module.classifier[-1] = nn.Linear(in_features=256, out_features=8)
+    model.cuda()
 
     criterion = FocalLoss()
     optimizer = optim.AdamW(model.parameters(), lr=cfg['lr'], weight_decay=cfg['weight_decay'])
