@@ -136,7 +136,10 @@ if __name__ == '__main__':
     optimizer = optim.AdamW(model.parameters(), lr=cfg['lr'], weight_decay=cfg['weight_decay'])
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=cfg['step_size'], gamma=cfg['gamma'])
 
-    
+    if not os.path.exists(cfg['saved_path']):
+        os.mkdir(cfg['saved_path'])
+
+
     best_model_wts, best_model_loss_wts, best_acc, best_loss = train_model(model, criterion, optimizer, scheduler, cfg)
     torch.save(best_model_wts, os.path.join(cfg['saved_path'], f'MeshNet_best_{best_acc}.pkl'))
     torch.save(best_model_loss_wts, os.path.join(cfg['saved_path'], f'MeshNet_{best_loss}.pkl'))
