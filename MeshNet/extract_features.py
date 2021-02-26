@@ -21,9 +21,18 @@ parser.add_argument('-t', '--task',
 parser.add_argument('-f', '--fold',
                     type=int,
                     help='fold index')
+parser.add_argument('-r', '--data_root',
+                    type=str,
+                    help='path to MeshNet')
+parser.add_argument('--num_faces',
+                    type=int,
+                    help='number of faces')
 args = parser.parse_args()
 
 cfg = get_test_config()
+cfg['dataset']['data_root'] = args.data_root
+cfg['dataset']['max_faces'] = args.num_faces
+
 os.environ['CUDA_VISIBLE_DEVICES'] = cfg['cuda_devices']
 
 

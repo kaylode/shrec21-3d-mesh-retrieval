@@ -1,3 +1,4 @@
+# Arguments
 ROOT='/home/nhtlong/pmkhoi/shrec21/retrieval/MeshNet/'
 
 FOLD=4

@@ -1,8 +1,13 @@
+# Arguments
+ROOT='/home/nhtlong/pmkhoi/shrec21/retrieval/MeshNet/'
+
 FOLD=4
 TASK='Shape'
 NUM_FACES=15000
-ROOT='/home/nhtlong/pmkhoi/shrec21/retrieval/MeshNet/'
+
 SAVED_PATH="/home/nhtlong/pmkhoi/shrec21/retrieval/MeshNet/ckpt_root/shape/test"
+
+
 
 DATA_ROOT="$ROOT/datasets/dataset${TASK}/simplified_folds/fold_${FOLD}"
 

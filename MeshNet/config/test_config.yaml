@@ -1,15 +1,12 @@
 # CUDA
-cuda_devices: '0'
+cuda_devices: '0,1'
 
 # dataset
 dataset:
-  data_root: '/home/nhtlong/pmkhoi/shrec21/retrieval/MeshNet/datasets/datasetShape/simplified_folds/fold_4'
-  test_root: '/home/nhtlong/pmkhoi/shrec21/retrieval/MeshNet/datasets/datasetShape/simplified_test'
+  data_root: ''
+  test_root: ''
   augment_data: false
-  max_faces: 15000
-
-# model
-load_model: '/home/nhtlong/pmkhoi/shrec21/retrieval/MeshNet/ckpt_root/shape/fold4-best/MeshNet_fold4_best_0.8333333333333334.pkl'
+  max_faces: 0
 
 # MeshNet
 MeshNet:

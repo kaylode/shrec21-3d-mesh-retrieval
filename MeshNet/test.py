@@ -75,6 +75,9 @@ class Testset(data.Dataset):
         return centers, corners, normals, neighbor_index, filename
 
 cfg = get_test_config()
+cfg['dataset']['test_root'] = args.test_root
+cfg['dataset']['max_faces'] = args.num_faces
+
 os.environ['CUDA_VISIBLE_DEVICES'] = cfg['cuda_devices']
 
 data_set = Testset(cfg=cfg['dataset'])
