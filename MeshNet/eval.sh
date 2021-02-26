@@ -1,6 +1,6 @@
 ROOT='/home/nhtlong/pmkhoi/shrec21/retrieval/MeshNet/'
 
-FOLD=3
+FOLD=4
 TASK='Shape'
 
 WEIGHT=''
@@ -12,7 +12,8 @@ QUERY_CSV="$ROOT/datasets/dataset${TASK}/annotations/${FOLD}_val.csv"
 GALLERY_CSV="$ROOT/datasets/dataset${TASK}/annotations/${FOLD}_train.csv"
 REPORT_CSV="$ROOT/results/${FOLD}/f${FOLD}-report.csv"
 
-python extract_features.py -f $FOLD -w $WEIGHT
+python one_hot_gt.py -t $TASK -r $ROOT
+python extract_features.py -f $FOLD -w $WEIGHT -t $TASK
 
 cd scripts
 python gen_distmat.py -q $NPY_PATH -g $GT_NPY_PATH -o $TXT_PATH

@@ -4,12 +4,23 @@ import numpy as np
 from tqdm import tqdm
 import pandas as pd
 
+parser = argparse.ArgumentParser()
+parser.add_argument('-t', '--task',
+                    type=str,
+                    help='[Shape|Culture]')
+parser.add_argument('-r', '--root',
+                    type=str,
+                    help='path to MeshNet')
+args = parser.parse_args()
 
-
-CSV_FILE = '/home/nhtlong/pmkhoi/shrec21/retrieval/MeshNet/datasets/datasetShape/annotations/dataset.csv'
+CSV_FILE = f'{args.root}/datasets/dataset{args.task}/annotations/dataset.csv'
 
 def one_hot_embedding(label):
-    return np.eye(8)[label]
+    if args.task == 'Shape':
+        num_classes = 8
+    else:
+        num_classes = 6
+    return np.eye(num_classes)[label]
 
 def main():
     embed_dict = {}

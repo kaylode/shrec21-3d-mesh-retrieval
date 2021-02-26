@@ -70,79 +70,143 @@ def find_neighbor(faces, faces_contain_this_vertex, vf1, vf2, except_face):
 
 if __name__ == '__main__':
 
-    root = f'{args.root}/datasets/dataset{args.task}/folds/fold_{args.fold}'
-    new_root = f'{args.root}/datasets/dataset{args.task}/simplified_folds/fold_{args.fold}'
+    if args.fold==-1:
+        root = f'{args.root}/datasets/dataset{args.task}/objects/test'
+        new_root = f'{args.root}/datasets/dataset{args.task}/simplified_test/'
+    else:
+        root = f'{args.root}/datasets/dataset{args.task}/folds/fold_{args.fold}'
+        new_root = f'{args.root}/datasets/dataset{args.task}/simplified_folds/fold_{args.fold}'
     if not os.path.exists(new_root):
         os.makedirs(new_root)
-    for type in os.listdir(root):
-        for phrase in ['train', 'test']:
-            new_type_path = os.path.join(new_root, type)
-            new_phrase_path = os.path.join(new_type_path, phrase)
 
-            old_type_path = os.path.join(root, type)
-            old_phrase_path = os.path.join(old_type_path, phrase)
-
-            if not os.path.exists(new_type_path):
-                os.mkdir(new_type_path)
-            if not os.path.exists(new_phrase_path):
-                os.mkdir(new_phrase_path)
-
-            files = glob.glob(os.path.join(old_phrase_path, '*.obj'))
-            for file in files:
-                # load mesh
-                mesh_ = load_mesh(file)
-                mesh = remesh(mesh_, target_n_faces=args.num_faces)
+    if args.fold==-1:
+        files = glob.glob(os.path.join(root, '*.obj'))
+        for file in files:
+            # load mesh
+            mesh_ = load_mesh(file)
+            mesh = remesh(mesh_, target_n_faces=args.num_faces)
 
 
-                # get elements
-                vertices = np.asarray(mesh.vertices).copy()
-                faces = np.asarray(mesh.triangles).copy()
+            # get elements
+            vertices = np.asarray(mesh.vertices).copy()
+            faces = np.asarray(mesh.triangles).copy()
 
-                # move to center
-                center = (np.max(vertices, 0) + np.min(vertices, 0)) / 2
-                vertices -= center
+            # move to center
+            center = (np.max(vertices, 0) + np.min(vertices, 0)) / 2
+            vertices -= center
 
-                # normalize
-                max_len = np.max(vertices[:, 0]**2 + vertices[:, 1]**2 + vertices[:, 2]**2)
-                vertices /= np.sqrt(max_len)
+            # normalize
+            max_len = np.max(vertices[:, 0]**2 + vertices[:, 1]**2 + vertices[:, 2]**2)
+            vertices /= np.sqrt(max_len)
 
-                # get normal vector
-                mesh.compute_triangle_normals()
-                face_normal = np.asarray(mesh.triangle_normals).copy()
+            # get normal vector
+            mesh.compute_triangle_normals()
+            face_normal = np.asarray(mesh.triangle_normals).copy()
 
-                # get neighbors
-                faces_contain_this_vertex = []
-                for i in range(len(vertices)):
-                    faces_contain_this_vertex.append(set([]))
-                centers = []
-                corners = []
-                for i in range(len(faces)):
-                    [v1, v2, v3] = faces[i]
-                    x1, y1, z1 = vertices[v1]
-                    x2, y2, z2 = vertices[v2]
-                    x3, y3, z3 = vertices[v3]
-                    centers.append([(x1 + x2 + x3) / 3, (y1 + y2 + y3) / 3, (z1 + z2 + z3) / 3])
-                    corners.append([x1, y1, z1, x2, y2, z2, x3, y3, z3])
-                    faces_contain_this_vertex[v1].add(i)
-                    faces_contain_this_vertex[v2].add(i)
-                    faces_contain_this_vertex[v3].add(i)
+            # get neighbors
+            faces_contain_this_vertex = []
+            for i in range(len(vertices)):
+                faces_contain_this_vertex.append(set([]))
+            centers = []
+            corners = []
+            for i in range(len(faces)):
+                [v1, v2, v3] = faces[i]
+                x1, y1, z1 = vertices[v1]
+                x2, y2, z2 = vertices[v2]
+                x3, y3, z3 = vertices[v3]
+                centers.append([(x1 + x2 + x3) / 3, (y1 + y2 + y3) / 3, (z1 + z2 + z3) / 3])
+                corners.append([x1, y1, z1, x2, y2, z2, x3, y3, z3])
+                faces_contain_this_vertex[v1].add(i)
+                faces_contain_this_vertex[v2].add(i)
+                faces_contain_this_vertex[v3].add(i)
 
-                neighbors = []
-                for i in range(len(faces)):
-                    [v1, v2, v3] = faces[i]
-                    n1 = find_neighbor(faces, faces_contain_this_vertex, v1, v2, i)
-                    n2 = find_neighbor(faces, faces_contain_this_vertex, v2, v3, i)
-                    n3 = find_neighbor(faces, faces_contain_this_vertex, v3, v1, i)
-                    neighbors.append([n1, n2, n3])
+            neighbors = []
+            for i in range(len(faces)):
+                [v1, v2, v3] = faces[i]
+                n1 = find_neighbor(faces, faces_contain_this_vertex, v1, v2, i)
+                n2 = find_neighbor(faces, faces_contain_this_vertex, v2, v3, i)
+                n3 = find_neighbor(faces, faces_contain_this_vertex, v3, v1, i)
+                neighbors.append([n1, n2, n3])
 
-                centers = np.array(centers)
-                corners = np.array(corners)
-                faces = np.concatenate([centers, corners, face_normal], axis=1)
-                neighbors = np.array(neighbors)
+            centers = np.array(centers)
+            corners = np.array(corners)
+            faces = np.concatenate([centers, corners, face_normal], axis=1)
+            neighbors = np.array(neighbors)
 
-                _, filename = os.path.split(file)
-                save_path = os.path.join(new_phrase_path, filename[:-4] + '.npz')
-                np.savez(save_path,
-                         faces=faces, neighbors=neighbors)
+            _, filename = os.path.split(file)
+            save_path = os.path.join(new_root, filename[:-4] + '.npz')
+            np.savez(save_path,
+                        faces=faces, neighbors=neighbors)
+    else: 
+        for type in os.listdir(root):
+            for phrase in ['train', 'test']:
+                new_type_path = os.path.join(new_root, type)
+                new_phrase_path = os.path.join(new_type_path, phrase)
+
+                old_type_path = os.path.join(root, type)
+                old_phrase_path = os.path.join(old_type_path, phrase)
+
+                if not os.path.exists(new_type_path):
+                    os.mkdir(new_type_path)
+                if not os.path.exists(new_phrase_path):
+                    os.mkdir(new_phrase_path)
+
+                files = glob.glob(os.path.join(old_phrase_path, '*.obj'))
+                for file in files:
+                    # load mesh
+                    mesh_ = load_mesh(file)
+                    mesh = remesh(mesh_, target_n_faces=args.num_faces)
+
+
+                    # get elements
+                    vertices = np.asarray(mesh.vertices).copy()
+                    faces = np.asarray(mesh.triangles).copy()
+
+                    # move to center
+                    center = (np.max(vertices, 0) + np.min(vertices, 0)) / 2
+                    vertices -= center
+
+                    # normalize
+                    max_len = np.max(vertices[:, 0]**2 + vertices[:, 1]**2 + vertices[:, 2]**2)
+                    vertices /= np.sqrt(max_len)
+
+                    # get normal vector
+                    mesh.compute_triangle_normals()
+                    face_normal = np.asarray(mesh.triangle_normals).copy()
+
+                    # get neighbors
+                    faces_contain_this_vertex = []
+                    for i in range(len(vertices)):
+                        faces_contain_this_vertex.append(set([]))
+                    centers = []
+                    corners = []
+                    for i in range(len(faces)):
+                        [v1, v2, v3] = faces[i]
+                        x1, y1, z1 = vertices[v1]
+                        x2, y2, z2 = vertices[v2]
+                        x3, y3, z3 = vertices[v3]
+                        centers.append([(x1 + x2 + x3) / 3, (y1 + y2 + y3) / 3, (z1 + z2 + z3) / 3])
+                        corners.append([x1, y1, z1, x2, y2, z2, x3, y3, z3])
+                        faces_contain_this_vertex[v1].add(i)
+                        faces_contain_this_vertex[v2].add(i)
+                        faces_contain_this_vertex[v3].add(i)
+
+                    neighbors = []
+                    for i in range(len(faces)):
+                        [v1, v2, v3] = faces[i]
+                        n1 = find_neighbor(faces, faces_contain_this_vertex, v1, v2, i)
+                        n2 = find_neighbor(faces, faces_contain_this_vertex, v2, v3, i)
+                        n3 = find_neighbor(faces, faces_contain_this_vertex, v3, v1, i)
+                        neighbors.append([n1, n2, n3])
+
+                    centers = np.array(centers)
+                    corners = np.array(corners)
+                    faces = np.concatenate([centers, corners, face_normal], axis=1)
+                    neighbors = np.array(neighbors)
+
+                    _, filename = os.path.split(file)
+                    save_path = os.path.join(new_phrase_path, filename[:-4] + '.npz')
+                    np.savez(save_path,
+                            faces=faces, neighbors=neighbors)
 
                 

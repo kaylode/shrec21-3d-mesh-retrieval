@@ -15,6 +15,9 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-w', '--weight',
                     type=str,
                     help='path to the trained weight')
+parser.add_argument('-t', '--task',
+                    type=str,
+                    help='[Culture|Shape]')
 parser.add_argument('-f', '--fold',
                     type=int,
                     help='fold index')
@@ -60,10 +63,16 @@ def test_model(model):
 
 if __name__ == '__main__':
 
+    if args.task == 'Shape':
+        num_classes = 8
+    else:
+        num_classes = 6
+
+
     model = MeshNet(cfg=cfg['MeshNet'], require_fea=True)
     model.cuda()
     model = nn.DataParallel(model)
-    model.module.classifier[-1] = nn.Linear(in_features=256, out_features=6).cuda()
+    model.module.classifier[-1] = nn.Linear(in_features=256, out_features=num_classes).cuda()
     model.load_state_dict(torch.load(args.weight))
     
     if not os.path.exists(f'./results/{args.fold}'):

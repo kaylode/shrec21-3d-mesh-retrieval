@@ -3,7 +3,7 @@ cuda_devices: '0'   # multi-gpu training is available
 
 # dataset
 dataset:
-  data_root: '/home/nhtlong/pmkhoi/shrec21/retrieval/MeshNet/datasets/datasetShape/simplified_folds/fold_2'
+  data_root: '/home/nhtlong/pmkhoi/shrec21/retrieval/MeshNet/datasets/datasetShape/simplified_folds/fold_4'
   augment_data: true
   max_faces: 20000
 
