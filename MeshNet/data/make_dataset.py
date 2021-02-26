@@ -45,7 +45,7 @@ def make_folder(df, type_='train'):
 
 ROOT_DIR = f'{args.root}/datasets/dataset{args.task}/folds/fold_{args.fold}'
 if not os.path.exists(ROOT_DIR):
-    os.mkdir(ROOT_DIR)
+    os.makedirs(ROOT_DIR)
 train_df = pd.read_csv(f'{args.root}/datasets/dataset{args.task}/annotations/{args.fold}_train.csv')
 val_df = pd.read_csv(f'{args.root}/datasets/dataset{args.task}/annotations/{args.fold}_val.csv')
 

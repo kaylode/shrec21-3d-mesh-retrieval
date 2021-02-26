@@ -73,7 +73,7 @@ if __name__ == '__main__':
     root = f'{args.root}/datasets/dataset{args.task}/folds/fold_{args.fold}'
     new_root = f'{args.root}/datasets/dataset{args.task}/simplified_folds/fold_{args.fold}'
     if not os.path.exists(new_root):
-        os.mkdir(new_root)
+        os.makedirs(new_root)
     for type in os.listdir(root):
         for phrase in ['train', 'test']:
             new_type_path = os.path.join(new_root, type)
