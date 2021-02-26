@@ -11,8 +11,28 @@ from models import MeshNet
 from utils import append_feature, calculate_map
 from tqdm import tqdm
 from losses import FocalLoss
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-r', '--data_root',
+                    type=str,
+                    help='path to MeshNet')
+parser.add_argument('-t', '--task',
+                    type=str,
+                    help='[Culture|Shape]')
+parser.add_argument('-s', '--saved_path',
+                    type=str,
+                    help='save checkpoint to')
+parser.add_argument('--num_faces',
+                    type=int,
+                    help='number of faces')
+args = parser.parse_args()
 
 cfg = get_train_config()
+cfg['dataset']['data_root'] = args.data_root
+cfg['dataset']['max_faces'] = args.num_faces
+cfg['saved_path'] = args.saved_path
+
 os.environ['CUDA_VISIBLE_DEVICES'] = cfg['cuda_devices']
 
 
@@ -83,7 +103,7 @@ def train_model(model, criterion, optimizer, scheduler, cfg):
                         best_acc = epoch_acc
                         best_model_wts = copy.deepcopy(model.state_dict())
                     if epoch % 10 == 0:
-                        torch.save(copy.deepcopy(model.state_dict()), os.path.join(cfg['ckpt_root'],f'{epoch}.pkl'))
+                        torch.save(copy.deepcopy(model.state_dict()), os.path.join(cfg['saved_path'],f'{epoch}.pkl'))
 
                     print('{} Loss: {:.4f} Acc: {:.4f}'.format(phrase, epoch_loss, epoch_acc))
     except KeyboardInterrupt:
@@ -94,12 +114,18 @@ def train_model(model, criterion, optimizer, scheduler, cfg):
 
 if __name__ == '__main__':
 
+    if args.task == 'Shape':
+        num_classes = 8
+    else:
+        num_classes = 6
+
     model = MeshNet(cfg=cfg['MeshNet'], require_fea=True)
     model = nn.DataParallel(model)
 
     if 'pretrained' in cfg.keys():
         model.load_state_dict(torch.load(cfg['pretrained']))
-    model.module.classifier[-1] = nn.Linear(in_features=256, out_features=8)
+
+    model.module.classifier[-1] = nn.Linear(in_features=256, out_features=num_classes)
     model.cuda()
 
     criterion = FocalLoss()
@@ -108,7 +134,7 @@ if __name__ == '__main__':
 
     
     best_model_wts, best_acc = train_model(model, criterion, optimizer, scheduler, cfg)
-    torch.save(best_model_wts, os.path.join(cfg['ckpt_root'], f'MeshNet_best_{best_acc}.pkl'))
+    torch.save(best_model_wts, os.path.join(cfg['saved_path'], f'MeshNet_best_{best_acc}.pkl'))
     print(f'Best model saved! Best Acc: {best_acc}')
     
         

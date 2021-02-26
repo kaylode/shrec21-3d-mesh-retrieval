@@ -1,14 +1,14 @@
 # CUDA
-cuda_devices: '0'   # multi-gpu training is available
+cuda_devices: '0,1'   # multi-gpu training is available
 
 # dataset
 dataset:
-  data_root: '/home/nhtlong/pmkhoi/shrec21/retrieval/MeshNet/datasets/datasetShape/simplified_folds/fold_4'
+  data_root: ""
   augment_data: true
-  max_faces: 20000
+  max_faces: 0
 
 # result
-ckpt_root: 'ckpt_root/shape/fold2-20k'
+ckpt_root: ""
 
 # MeshNet
 pretrained: '/home/nhtlong/pmkhoi/shrec21/retrieval/MeshNet/weight/MeshNet_best_9192.pkl'
@@ -23,7 +23,7 @@ MeshNet:
 lr: 0.001
 momentum: 0.9
 weight_decay: 0.0005
-batch_size: 2
+batch_size: 8
 max_epoch: 120
 step_size: 75
 gamma: 0.5
