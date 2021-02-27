@@ -4,7 +4,6 @@ import torch
 import torch.utils.data as data
 import torch.nn.functional as F
 
-
 type_to_index_map = {
     'botella':0, 
     'cantaro':1,
@@ -25,7 +24,7 @@ type_to_index_map = {
 #     'SUPE':5
 # }
 
-class ModelNet40(data.Dataset):
+class SHREC21Dataset(data.Dataset):
 
     def __init__(self, cfg, part='train', return_index=False):
         self.root = cfg['data_root']

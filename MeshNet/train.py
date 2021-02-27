@@ -6,9 +6,8 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.utils.data as data
 from config import get_train_config
-from data import ModelNet40
+from data import SHREC21Dataset
 from models import MeshNet
-from utils import append_feature, calculate_map
 from tqdm import tqdm
 from losses import FocalLoss
 import argparse
@@ -37,7 +36,7 @@ os.environ['CUDA_VISIBLE_DEVICES'] = cfg['cuda_devices']
 
 
 data_set = {
-    x: ModelNet40(cfg=cfg['dataset'], part=x) for x in ['train', 'test']
+    x: SHREC21Dataset(cfg=cfg['dataset'], part=x) for x in ['train', 'test']
 }
 data_loader = {
     x: data.DataLoader(data_set[x], batch_size=cfg['batch_size'], num_workers=8, shuffle=True, pin_memory=True, collate_fn=data_set[x].collate_fn)
@@ -61,14 +60,12 @@ def train_model(model, criterion, optimizer, scheduler, cfg):
             for phrase in ['train', 'test']:
 
                 if phrase == 'train':
-                    scheduler.step()
                     model.train()
                 else:
                     model.eval()
 
                 running_loss = 0.0
                 running_corrects = 0
-                ft_all, lbl_all = None, None
 
                 for i, (centers, corners, normals, neighbor_index, targets) in enumerate(tqdm(data_loader[phrase])):
 
@@ -97,6 +94,7 @@ def train_model(model, criterion, optimizer, scheduler, cfg):
                 epoch_acc = running_corrects.double() / len(data_set[phrase])
 
                 if phrase == 'train':
+                    scheduler.step()
                     print('{} Loss: {:.4f} Acc: {:.4f}'.format(phrase, epoch_loss, epoch_acc))
 
                 if phrase == 'test':
@@ -110,6 +108,7 @@ def train_model(model, criterion, optimizer, scheduler, cfg):
                         torch.save(copy.deepcopy(model.state_dict()), os.path.join(cfg['saved_path'],f'{epoch}.pkl'))
 
                     print('{} Loss: {:.4f} Acc: {:.4f}'.format(phrase, epoch_loss, epoch_acc))
+
     except KeyboardInterrupt:
         return best_model_wts, best_model_loss_wts, best_acc, best_loss
 
@@ -123,16 +122,15 @@ if __name__ == '__main__':
     else:
         num_classes = 6
 
-    model = MeshNet(cfg=cfg['MeshNet'], require_fea=True)
+    model = MeshNet(cfg=cfg['MeshNet'], num_classes=num_classes, require_fea=True)
     model = nn.DataParallel(model)
 
     if 'pretrained' in cfg.keys():
         model.load_state_dict(torch.load(cfg['pretrained']))
 
-    model.module.classifier[-1] = nn.Linear(in_features=256, out_features=num_classes)
     model.cuda()
 
-    criterion = FocalLoss()
+    criterion = nn.CrossEntropyLoss()
     optimizer = optim.AdamW(model.parameters(), lr=cfg['lr'], weight_decay=cfg['weight_decay'])
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=cfg['step_size'], gamma=cfg['gamma'])
 
@@ -141,8 +139,11 @@ if __name__ == '__main__':
 
 
     best_model_wts, best_model_loss_wts, best_acc, best_loss = train_model(model, criterion, optimizer, scheduler, cfg)
-    torch.save(best_model_wts, os.path.join(cfg['saved_path'], f'MeshNet_best_{best_acc}.pkl'))
-    torch.save(best_model_loss_wts, os.path.join(cfg['saved_path'], f'MeshNet_{best_loss}.pkl'))
+
+    best_acc = np.round(float(best_acc), 4)
+    best_loss = np.round(float(best_loss), 4)
+    torch.save(best_model_wts, os.path.join(cfg['saved_path'], f'MeshNet_best_acc_{best_acc}.pkl'))
+    torch.save(best_model_loss_wts, os.path.join(cfg['saved_path'], f'MeshNet_best_loss_{best_loss}.pkl'))
     print(f'Best model saved! Best Acc: {best_acc}')
     
         

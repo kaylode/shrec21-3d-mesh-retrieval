@@ -11,7 +11,7 @@ dataset:
 ckpt_root: ""
 
 # MeshNet
-pretrained: '/home/nhtlong/pmkhoi/shrec21/retrieval/MeshNet/weight/MeshNet_best_9192.pkl'
+#pretrained: '/content/main/MeshNet/weight/MeshNet_best_9192.pkl'
 MeshNet:
   structural_descriptor:
     num_kernel: 64
@@ -23,7 +23,7 @@ MeshNet:
 lr: 0.001
 momentum: 0.9
 weight_decay: 0.0005
-batch_size: 8
-max_epoch: 120
+batch_size: 4
+max_epoch: 200
 step_size: 75
-gamma: 0.5
+gamma: 0.1

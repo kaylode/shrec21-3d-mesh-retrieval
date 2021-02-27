@@ -19,6 +19,9 @@ parser.add_argument('-t', '--task',
 parser.add_argument('--num_faces',
                     type=int,
                     help='number of faces')
+parser.add_argument('-f','--fold',
+                    type=int,
+                    help='fold index')
 parser.add_argument('-r', '--test_root',
                     type=str,
                     help='number of faces')
@@ -110,7 +113,7 @@ def inference(model):
         embed_npy.append(embed_dict[i])
 
     print(f'Number of embeddings in testset: {len(ids)}')
-    np.save(f'./results/test/embed.npy',embed_npy)
+    np.save(f'./results/test/embed_{args.fold}.npy',embed_npy)
 
 if __name__ == '__main__':
     if args.task == 'Shape':
@@ -118,10 +121,9 @@ if __name__ == '__main__':
     else:
         num_classes = 6
 
-    model = MeshNet(cfg=cfg['MeshNet'], require_fea=True)
+    model = MeshNet(cfg=cfg['MeshNet'], num_classes=num_classes, require_fea=True)
     model.cuda()
     model = nn.DataParallel(model)
-    model.module.classifier[-1] = nn.Linear(in_features=256, out_features=num_classes).cuda()
     model.load_state_dict(torch.load(args.weight))
 
     if not os.path.exists(f'./results/test'):

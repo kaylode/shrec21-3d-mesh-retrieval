@@ -5,7 +5,7 @@ from models import SpatialDescriptor, StructuralDescriptor, MeshConvolution
 
 class MeshNet(nn.Module):
 
-    def __init__(self, cfg, require_fea=False):
+    def __init__(self, cfg, num_classes, require_fea=False):
         super(MeshNet, self).__init__()
         self.require_fea = require_fea
 
@@ -30,7 +30,7 @@ class MeshNet(nn.Module):
             nn.Linear(512, 256),
             nn.ReLU(),
             nn.Dropout(p=0.5),
-            nn.Linear(256, 40)
+            nn.Linear(256, num_classes)
         )
 
     def forward(self, centers, corners, normals, neighbor_index):

@@ -5,9 +5,8 @@ from torch.autograd import Variable
 import torch.nn as nn
 import torch.utils.data as data
 from config import get_test_config
-from data import ModelNet40
+from data import SHREC21Dataset
 from models import MeshNet
-from utils import append_feature
 from tqdm import tqdm
 import argparse
 
@@ -37,7 +36,7 @@ os.environ['CUDA_VISIBLE_DEVICES'] = cfg['cuda_devices']
 
 
 data_set = {
-    x: ModelNet40(cfg=cfg['dataset'], part=x, return_index=True) for x in ['train', 'test']
+    x: SHREC21Dataset(cfg=cfg['dataset'], part=x, return_index=True) for x in ['train', 'test']
 }
 data_loader = {
     x: data.DataLoader(data_set[x], batch_size=1, num_workers=8, shuffle=False, pin_memory=True)
@@ -78,10 +77,9 @@ if __name__ == '__main__':
         num_classes = 6
 
 
-    model = MeshNet(cfg=cfg['MeshNet'], require_fea=True)
+    model = MeshNet(cfg=cfg['MeshNet'], num_classes=num_classes, require_fea=True)
     model.cuda()
     model = nn.DataParallel(model)
-    model.module.classifier[-1] = nn.Linear(in_features=256, out_features=num_classes).cuda()
     model.load_state_dict(torch.load(args.weight))
     
     if not os.path.exists(f'./results/{args.fold}'):

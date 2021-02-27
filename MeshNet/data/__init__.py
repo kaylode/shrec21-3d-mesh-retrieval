@@ -1,1 +1,1 @@
-from .ModelNet40 import ModelNet40
+from .shrec21_dataset import SHREC21Dataset

@@ -11,6 +11,9 @@ parser.add_argument('-t', '--task',
 parser.add_argument('-r', '--root',
                     type=str,
                     help='path to MeshNet')
+parser.add_argument('-o', '--output_path',
+                    type=str,
+                    help='path to save gt .npy')
 args = parser.parse_args()
 
 CSV_FILE = f'{args.root}/datasets/dataset{args.task}/annotations/dataset.csv'
@@ -33,8 +36,8 @@ def main():
     for i in ids:
         embed_npy.append(embed_dict[i])
 
-    print(f'Number of embeddings: {len(ids)}')
-    np.save('./results/gt.npy',embed_npy)
+    print(f'Number of gallery embeddings: {len(ids)}')
+    np.save(f'{args.output_path}',embed_npy)
 
 if __name__ == '__main__':
     main()

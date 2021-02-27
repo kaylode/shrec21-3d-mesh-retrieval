@@ -1,0 +1,4 @@
+ckpt_root/
+datasets/
+results/
+*.pyc

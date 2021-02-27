@@ -1,7 +1,8 @@
 # Arguments
 ROOT='/home/nhtlong/pmkhoi/shrec21/retrieval/MeshNet/'
+cd $ROOT
 
-FOLD=1
+FOLD=4
 TASK='Shape'
 NUM_FACES=20000
 

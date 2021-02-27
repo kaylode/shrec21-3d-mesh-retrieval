@@ -138,4 +138,6 @@ if args.rerank:
     dist_mat = re_ranking(q_g, q_q, g_g)
 else:
     dist_mat = dist(q, g)
+
+print("Distance matrix shape: ", dist_mat.shape)
 np.savetxt(args.output, dist_mat, fmt=args.format)
