@@ -1,6 +1,6 @@
 # MeshNet
 
-<img src="./MeshNet/doc/pipeline.png" width="700">
+<img src="./doc/pipeline.png" width="700">
 
 ## Folder Structure
 ```
