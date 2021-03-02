@@ -1,12 +1,12 @@
 # Arguments
-ROOT='/home/nhtlong/pmkhoi/shrec21/retrieval/MeshNet/'
+ROOT='/home/pmkhoi/source/shrec21/retrieval/MeshNet/'
 cd $ROOT
 
-FOLD=4
-TASK='Shape'
-NUM_FACES=20000
+FOLD=1
+TASK='Culture'
+NUM_FACES=30000
 
-SAVED_PATH="/home/nhtlong/pmkhoi/shrec21/retrieval/MeshNet/ckpt_root/shape/20k-fold${FOLD}"
+SAVED_PATH="/home/pmkhoi/source/shrec21/retrieval/MeshNet/ckpt_root/shape/30k-fold${FOLD}"
 
 DATA_ROOT="$ROOT/datasets/dataset${TASK}/folds/fold_${FOLD}"
 

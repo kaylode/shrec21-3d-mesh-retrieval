@@ -1,10 +1,10 @@
 # Arguments
-ROOT='/home/nhtlong/pmkhoi/shrec21/retrieval/MeshNet/'
+ROOT='/home/pmkhoi/source/shrec21/retrieval/MeshNet/'
 cd $ROOT
 
-FOLD=4
-TASK='Shape'
-NUM_FACES=20000
+FOLD=1
+TASK='Culture'
+NUM_FACES=30000
 
 DATA_ROOT="$ROOT/datasets/dataset${TASK}/objects/train"
 
