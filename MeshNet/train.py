@@ -1,6 +1,7 @@
 import copy
 import os
 import torch
+import numpy as np
 from torch.autograd import Variable
 import torch.nn as nn
 import torch.optim as optim
@@ -10,6 +11,7 @@ from data import SHREC21Dataset
 from models import MeshNet
 from tqdm import tqdm
 from losses import FocalLoss
+from metrics import *
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -44,11 +46,13 @@ data_loader = {
 }
 
 
-def train_model(model, criterion, optimizer, scheduler, cfg):
-
-    best_acc = 0.0
-    best_map = 0.0
-    best_loss = 100
+def train_model(model, metrics, criterion, optimizer, scheduler, cfg):
+    best_values = {
+        "acc":0.0,
+        "bl_acc": 0.0,
+        "f1-score": 0.0,
+    }
+    
     best_model_wts = copy.deepcopy(model.state_dict())
     try:
         for epoch in range(1, cfg['max_epoch']):
@@ -85,7 +89,9 @@ def train_model(model, criterion, optimizer, scheduler, cfg):
                         if phrase == 'train':
                             loss.backward()
                             optimizer.step()
-
+                        else:
+                            for metric in metrics:
+                                metric.update(outputs, targets)
 
                         running_loss += loss.item() * centers.size(0)
                         running_corrects += torch.sum(preds == targets.data)
@@ -98,22 +104,28 @@ def train_model(model, criterion, optimizer, scheduler, cfg):
                     print('{} Loss: {:.4f} Acc: {:.4f}'.format(phrase, epoch_loss, epoch_acc))
 
                 if phrase == 'test':
-                    if epoch_acc > best_acc:
-                        best_acc = epoch_acc
-                        best_model_wts = copy.deepcopy(model.state_dict())
-                    if epoch_loss < best_loss:
-                        best_loss = epoch_loss
-                        best_model_loss_wts = copy.deepcopy(model.state_dict())
-                    if epoch % 10 == 0:
-                        torch.save(copy.deepcopy(model.state_dict()), os.path.join(cfg['saved_path'],f'{epoch}.pkl'))
+                    metric_dict = {}
+                    for metric in metrics:
+                        metric_dict.update(metric.value())
+                        metric.reset()
+                    
+                    for key, value in metric_dict.items():
+                        print(key, ': ', value)
 
-                    print('{} Loss: {:.4f} Acc: {:.4f}'.format(phrase, epoch_loss, epoch_acc))
+                    for key, value in metric_dict.items():
+                        if key not in ["each_acc"]:
+                            if metric_dict[key] > best_values[key]:
+                                best_values[key] = metric_dict[key]
+                                value = np.round(float(best_values[key]), 4)
+                                best_model_wts = copy.deepcopy(model.state_dict())
+                                torch.save(best_model_wts, os.path.join(cfg['saved_path'], f'MeshNet_best_{key}.pkl'))
+                        
+                    print('{} Loss: {:.4f}'.format(phrase, epoch_loss))
 
     except KeyboardInterrupt:
-        return best_model_wts, best_model_loss_wts, best_acc, best_loss
+        return best_values
 
-    return best_model_wts, best_model_loss_wts, best_acc, best_loss
-
+    return best_values
 
 if __name__ == '__main__':
 
@@ -133,17 +145,17 @@ if __name__ == '__main__':
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.AdamW(model.parameters(), lr=cfg['lr'], weight_decay=cfg['weight_decay'])
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=cfg['step_size'], gamma=cfg['gamma'])
+    metrics = [
+        AccuracyMetric(), 
+        BalancedAccuracyMetric(num_classes=num_classes),
+        F1ScoreMetric(n_classes=num_classes), ]
 
     if not os.path.exists(cfg['saved_path']):
         os.mkdir(cfg['saved_path'])
 
-
-    best_model_wts, best_model_loss_wts, best_acc, best_loss = train_model(model, criterion, optimizer, scheduler, cfg)
-
-    best_acc = np.round(float(best_acc), 4)
-    best_loss = np.round(float(best_loss), 4)
-    torch.save(best_model_wts, os.path.join(cfg['saved_path'], f'MeshNet_best_acc_{best_acc}.pkl'))
-    torch.save(best_model_loss_wts, os.path.join(cfg['saved_path'], f'MeshNet_best_loss_{best_loss}.pkl'))
-    print(f'Best model saved! Best Acc: {best_acc}')
+    best_values = train_model(model, metrics, criterion, optimizer, scheduler, cfg)
+    
+    for k,v in best_values.items():
+        print(f"Best {k}: {v}")
     
         
