@@ -138,9 +138,12 @@ if __name__ == '__main__':
     model = nn.DataParallel(model)
 
     if 'pretrained' in cfg.keys():
-        model.load_state_dict(torch.load(cfg['pretrained']))
+        try:
+            ret = model.load_state_dict(torch.load(cfg['pretrained']), strict=False)
+        except RuntimeError as e:
+            pass
 
-    model.cuda()
+    model = model.cuda()
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.AdamW(model.parameters(), lr=cfg['lr'], weight_decay=cfg['weight_decay'])
