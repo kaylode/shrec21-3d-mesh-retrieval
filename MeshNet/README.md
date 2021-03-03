@@ -40,7 +40,7 @@ this repo
   NUM_FACES=20000
   ```
 - Run ```prepare_data.sh``` to simplify and generate dataset
-- Run ```train.sh``` to start training, training configs can be found in ```config/train_config.yaml``
+- Run ```train.sh``` to start training, training configs can be found in ```config/train_config.yaml```
 - Specify WEIGHT in ```eval.sh``` then run to calculate metric scores
 - Run ```submission.sh``` to generate distance matrix for submission
 
