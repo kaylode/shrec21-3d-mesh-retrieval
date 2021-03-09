@@ -4,11 +4,13 @@
 - Challenge link: http://www.ivan-sipiran.com/shrec2021.html
 
 ## Datasets
-
 | Task Shape | Task Culture |
 |:-------------------------:|:-------------------------:|
 |<img width="500" height="300" alt="screen" src="demo/shape.PNG"> | <img width="500" height="300" alt="screen" src="demo/culture.PNG"> | 
 
+### Mesh Simplification
+![Alt Text](demo/simplify.PNG)
+*From left to right: Original (~40k faces) | 20k faces | 10k faces | 5k faces*
 
 ## Metric Descriptions
 Name | Description
@@ -25,7 +27,6 @@ Normalized Discounted Cumulative Gain (**NDCG**) | DCG measures the usefulness, 
 Model | MAP | NN | FT | ST | NDCG
 --- | --- | --- | --- | --- | ---
 MeshNet (ensemble) | 0.791 | 0.836 | 0.917 | 0.852 | 0.926
-
 
 ### Task Culture
 Model | MAP | NN | FT | ST | NDCG
