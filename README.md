@@ -2,7 +2,7 @@
 
 - This code is for HCMUS-TEAM at SHREC 2021: Retrieval of Cultural Heritage Objects
 - Challenge link: http://www.ivan-sipiran.com/shrec2021.html
-
+- Report: [link](demo/_SHREC21__RCHO__HCMUS_3.pdf)
 ## Datasets
 | Task Shape | Task Culture |
 |:-------------------------:|:-------------------------:|
